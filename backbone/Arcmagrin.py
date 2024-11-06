@@ -34,17 +34,13 @@ class ArcMarginProduct(nn.Module):
         # input [B, N, L]
         Bs = input.size(0)
         label = self.label.repeat(Bs, 1, 1).to(input.device)
-        # cosine -> [B, N, N]
         cosine = F.linear(F.normalize(input, dim=-1), F.normalize(self.weight))
-        # 计算sine -> [B, N, N]
         sine = torch.sqrt((1.0 - torch.pow(cosine, 2)).clamp(0, 1))
-        # 计算cos(\theta - \m)
         phi = cosine * self.cos_m - sine * self.sin_m
         if self.easy_margin:
             # cos(\theta) > 0 phi取cos(\theta - \m)
             phi = torch.where(cosine > 0, phi, cosine)
         else:
-            # 防止出现在第三象限
             phi = torch.where(cosine > self.th, phi, cosine - self.mm)
         # --------------------------- convert label to one-hot ---------------------------
         # one_hot = torch.zeros(cosine.size(), requires_grad=True, device='cuda')
@@ -106,9 +102,7 @@ class ArcMarginProduct_PartImage(nn.Module):
 
         cosine = torch.einsum("bqc,bcl->bql", F.normalize(input, dim=-1), F.normalize(weight, dim=-1).permute(0, 2, 1))
 
-        # 计算sine -> [B, N, N]
         sine = torch.sqrt((1.0 - torch.pow(cosine, 2)).clamp(0, 1))
-        # 计算cos(\theta - \m)
         phi = cosine * self.cos_m - sine * self.sin_m
         if self.easy_margin:
             # cos(\theta) > 0 phi取cos(\theta - \m)
