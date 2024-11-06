@@ -108,7 +108,6 @@ class ArcMarginProduct_PartImage(nn.Module):
             # cos(\theta) > 0 phi取cos(\theta - \m)
             phi = torch.where(cosine > 0, phi, cosine)
         else:
-            # 防止出现在第三象限
             phi = torch.where(cosine > self.th, phi, cosine - self.mm)
         # --------------------------- convert label to one-hot ---------------------------
         # one_hot = torch.zeros(cosine.size(), requires_grad=True, device='cuda')
