@@ -52,23 +52,16 @@ def adjusted_rand_score_overflow(labels_true, labels_pred):
                                        (tp + fp) * (fp + tn))
 
 def main_function():
-    # 获得参数
     args = parse_args()
-    # 更新参数
     update_config(cfg, args)
-    # 创建日志文件目录
     logger, final_output_dir, tb_log_dir = create_logger(cfg, cfg.TARGET)
-    # 输入输入参数
     logger.info(pprint.pformat(args))
-    # 输入CFG配置参数
     logger.info(cfg)
 
-    # 配置CUDNN参数
     torch.backends.cudnn.benchmark = cfg.CUDNN.BENCHMARK
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
 
-    # 声明模型
     model = UnsupervisedPart_PartImage(cfg.MODEL.NUM_Part, cfg.MODEL.OUT_DIM, cfg.TRAIN.PRE, cfg)
 
     model = torch.nn.DataParallel(model, device_ids=cfg.GPUS).cuda()
